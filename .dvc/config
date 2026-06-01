@@ -1,0 +1,4 @@
+[core]
+    remote = myremore
+['remote "myremore"']
+    url = /tmp/dvc-storage
