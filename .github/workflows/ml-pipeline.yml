@@ -23,7 +23,9 @@ jobs:
         run: pip install scikit-learn joblib numpy pytest fastapi uvicorn httpx
 
       - name: Train Model
-        run: python save_model.py
+        run: |
+          mkdir -p models
+          python save_model.py
 
       - name: Run Model Tests
         run : pytest tests/ -v
