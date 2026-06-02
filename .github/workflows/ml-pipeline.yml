@@ -1,0 +1,39 @@
+name: ML Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+
+jobs:
+  test-and-train:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-pyhton@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies 
+        run: pip install scikit-learn joblib numpy pytest fastapi uvicorn httpx
+
+      - name: Train Model
+        run: python save_model.py
+
+      - name: Run Model Tests
+        run : pytest tests/ -v
+
+      - name: Build docker image
+        run: docker build -t iris-classifier:${{ github.sha }} .
+
+      - name: Verify Docker container starts
+        run: |
+          docker run -d -p 8080:8080 --name test-container iris-classifier:${{ github.sha }}
+          sleep 5
+          curl -f http://localhost:8080/health
+          docker stop test-container
